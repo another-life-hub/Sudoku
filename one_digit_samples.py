@@ -1,13 +1,15 @@
+"""Реализация цепей с кандидатами одной цифры (single digit patterns)."""
+
 from join_chain_ends import join_chain_ends, rc_bp 
 
 def skyscraper(rn, cn):
-    """Метод 'Небоскрёб'"""
+    """Метод 'Небоскрёб'(skyscraper)."""
     res = ()
     H_LAYERS = {1, 2, 3}, {4, 5, 6}, {7, 8, 9}
     for n in range(1, 10):
-        for h in range(2): # 0/1 - случай направляющих строк/столбцов      
+        for h in range(2): # 0/1 - случай направляющих строк/столбцов
             if h == 0: m, pr = rn, 'строками'
-            if h == 1: m, pr = cn, 'столбцами'        
+            if h == 1: m, pr = cn, 'столбцами'
             for i0 in range(9): # поиск двузначной ячейки
                 s0 = m[i0][n - 1]
                 if type(s0) == int or len(s0) != 2:
@@ -23,8 +25,8 @@ def skyscraper(rn, cn):
                     i = i0, i1
                     # поиск удаляемых кандидатов в четырёх ячейках
                     for j in range(2):
-                        for k in range(1, 3): 
-                            i_ = i[j] + k - ((i[j] + k)//3 - i[j]//3) *3 
+                        for k in range(1, 3):
+                            i_ = i[j] + k - ((i[j] + k)//3 - i[j]//3) *3
                             if type(m[i_][n-1])== int or not v[j] in m[i_][n-1]:
                                 continue
                             if h == 0: res += i_, v[j] - 1, -n
@@ -39,13 +41,13 @@ def skyscraper(rn, cn):
                     return res
 
 def finned_x_wing(rn, cn):
-    """Поиск 2-решёток с браком"""
+    """Поиск 2-решёток с браком (finned x-wing)."""
     res = ()
     H_LAYERS = {1, 2, 3}, {4, 5, 6}, {7, 8, 9}
     for n in range(1, 10):
         for h in range(2): # 0/1 - случай направляющих строк/столбцов
             if h == 0: m, pr1, pr2 = rn, 'строками', 'и столбцами'
-            if h == 1: m, pr1, pr2 = cn, 'столбцами', 'и строками'        
+            if h == 1: m, pr1, pr2 = cn, 'столбцами', 'и строками'
             for i0 in range(9): # поиск двузначной ячейки в столбце
                 s0 = m[i0][n - 1]
                 if type(s0) == int or len(s0) != 2:
@@ -54,7 +56,7 @@ def finned_x_wing(rn, cn):
                     s1 = m[i1][n - 1] # s1, s0 (sets) - содержимое двух ячеек
                     if type(s1) == int or i1 in range(i0//3 *3, i0//3 *3 + 3):
                         continue # исключение слоя, где находится i0
-                    for layer in H_LAYERS: # поиск слоя 
+                    for layer in H_LAYERS: # поиск слоя
                         if s1 ^ s0 <= layer and len(s0 & layer) == 1: break
                     else:
                         continue # поиск следующей второй ячейки
@@ -78,7 +80,7 @@ def finned_x_wing(rn, cn):
                     return res
 
 def two_string_kite(rn, cn):
-    """Реализация цепи со струнами в строке и столбце"""
+    """Реализация цепи со струнами в строке и столбце (2-string kite)."""
     H_LAYERS = {1, 2, 3}, {4, 5, 6}, {7, 8, 9}
     for n in range(1, 10):
         for r0 in range(9): # поиск первой струны - двузначной ячейки в rn
@@ -103,27 +105,28 @@ def two_string_kite(rn, cn):
                         continue
                     print(f'Две струны ({n}) в строке {r0+1} и столбце {c+1}:',\
                           f'r{r1+1}c{c0+1} {-n}')
-                    return r1, c0, -n             
+                    return r1, c0, -n
 
 
 def grouped_2string_kite(rn, cn):
-    """Реализация цепи с групповыми струнами в строке и столбце"""
+    """Реализация цепи с групповыми струнами в строке и столбце
+       (grouped 2-string kite)."""
     H_LAYERS = {1, 2, 3}, {4, 5, 6}, {7, 8, 9}
     for n in range(1, 10):
         for r0 in range(9): # поиск первой групповой струны
             for l1 in H_LAYERS: # l1 - слой, в котором находится строка
-                if r0 + 1 in l1: break                    
+                if r0 + 1 in l1: break
             s0 = rn[r0][n - 1]
             if type(s0) == int: continue
             for l2 in H_LAYERS: # l2 - слой, в котором находится столбец
                 if len(s0 - l2) != 1: continue
-                pr1 = 'с группой ' if len(s0 & l2) != 1 else '' 
+                pr1 = 'с группой ' if len(s0 & l2) != 1 else ''
                 c0 = list(s0 - l2)[0] - 1 # (r0, c0) - I конец I струны
                 for c in l2 - s0:
                     s1 = cn[c-1][n-1]
                     if type(s1) == int or len(s1) == 1 or\
                        len(s1 - (l1 - {r0 + 1})) != 1: continue
-                    pr2 = 'с группой ' if len(s1 & l1) != 1 else '' 
+                    pr2 = 'с группой ' if len(s1 & l1) != 1 else ''
                     # (r1, c-1) - II конец II струны
                     r1 = list(s1 - (l1 - {r0 + 1}))[0] - 1
                     if type(rn[r1][n-1]) == int or c0 + 1 not in rn[r1][n-1]:
@@ -133,7 +136,7 @@ def grouped_2string_kite(rn, cn):
                     return r1, c0, -n
 
 def turbot_fish(rc, rn, cn, bn):
-    """Реализация цепи со струнами в блоке и строке/столбце"""
+    """Реализация цепи со струнами в блоке и строке/столбце (turbot fish)."""
     H_LAYERS = {1, 2, 3}, {4, 5, 6}, {7, 8, 9}
     V_LAYERS = {1, 4, 7}, {2, 5, 8}, {3, 6, 9}
     for n in range(1, 10):
@@ -161,11 +164,11 @@ def turbot_fish(rc, rn, cn, bn):
                            or rc_bp(r, c)[0] == b0: continue
                         print(f'Две струны ({n}) в блоке {b0 +1}',\
                               f'{pr} {pos[h] +1}: r{r+1}c{c+1} {-n}')
-                        return r, c, -n                         
-           
+                        return r, c, -n
+
 def empty_rectangle(rc, rn, cn, bn):
     """Реализация цепи с линейной связью в блоке 
-       и струной в строке или столбце"""
+       и струной в строке или столбце (empty rectangle)."""
     H_LAYERS = frozenset((1,2,3)), frozenset((4,5,6)), frozenset((7,8,9))
     V_LAYERS = frozenset((1,4,7)), frozenset((2,5,8)), frozenset((3,6,9))
     pairs = {(s1, s2) for s1 in V_LAYERS for s2 in H_LAYERS}
@@ -173,7 +176,7 @@ def empty_rectangle(rc, rn, cn, bn):
         for b0 in range(9):
             s0 = bn[b0][n - 1]
             if type(s0) == int or len(s0) == 2: # для двузначной ячейки 
-                continue                      # работает метод 'Струна в блоке' 
+                continue                      # работает метод 'Струна в блоке'
             for pair in pairs:
                 if s0 <= pair[0] | pair[1]: # найдены слои, в которых находятся
                     break                   # кандидаты цифры n в блоке b0
@@ -192,17 +195,17 @@ def empty_rectangle(rc, rn, cn, bn):
                     coord = list(m[pos[h]][n-1] - {pos[h-1] + 1})[0] - 1
                     pos0 = rc_bp(b0, list(pair[h-1])[0] - 1)
                     if h == 0: r, c = pos0[h], coord
-                    if h == 1: r, c = coord, pos0[h]                    
+                    if h == 1: r, c = coord, pos0[h]
                     if type(rc[r][c]) == int or n not in rc[r][c]\
                        or rc_bp(r, c)[0] == b0:
                         continue
                     print(f'Линейная связь ({n}) в блоке {b0 +1} и струна',\
                           f'{pr} {pos[h] +1}: r{r+1}c{c+1} {-n}')
-                    return r, c, -n              
+                    return r, c, -n
 
 def dual_empty_rectangle(rc, rn, cn, bn):
     """Реализация цепи с линейной связью в блоке
-       и двумя струнами в строке и столбце"""
+       и двумя струнами в строке и столбце (dual empty rectangle)."""
     H_LAYERS = frozenset((1,2,3)), frozenset((4,5,6)), frozenset((7,8,9))
     V_LAYERS = frozenset((1,4,7)), frozenset((2,5,8)), frozenset((3,6,9))
     pairs = {(s1, s2) for s1 in V_LAYERS for s2 in H_LAYERS}
@@ -230,24 +233,24 @@ def dual_empty_rectangle(rc, rn, cn, bn):
                     coord = list(m[pos[h]][n-1] - {pos[h-1] + 1})[0] - 1
                     if h == 0: ends2_r |= {(pos[h], coord)}
                     if h == 1: ends2_c |= {(coord, pos[h])}
-            # Соединение концов цепи  
+            # Соединение концов цепи
             for r1, c1 in ends2_r:
                 for r2, c2 in ends2_c:
                     if r1 == r2 and c1 == c2:# ячейка r1,c1 заполняется цифрой n
                         res, pr = (r1, c1, n), ''
                     elif rc_bp(r1,c1)[0] == rc_bp(r2,c2)[0]:#концы в одном блоке
-                        # случай замкнутой цепи                        
+                        # случай замкнутой цепи
                         b1,p1,p2=rc_bp(r1,c1)[0],rc_bp(r1,c1)[1],rc_bp(r2,c2)[1]
                         for p in bn[b1][n-1]: # удаление из блока b1
-                            if p-1 != p1 and p-1 != p2:  
-                                res += *rc_bp(b1, p-1), -n                                 
-                        r0 = rc_bp(b0, list(pair[1])[0] - 1)[0] 
+                            if p-1 != p1 and p-1 != p2:
+                                res += *rc_bp(b1, p-1), -n
+                        r0 = rc_bp(b0, list(pair[1])[0] - 1)[0]
                         for c in rn[r0][n-1]: # удаление из строки r0
-                            if c-1 !=c2 and c-1 not in range(b0%3 *3,b0%3 *3 +3):                               
-                                res += r0, c-1, -n 
+                            if c-1 !=c2 and c-1 not in range(b0%3 *3,b0%3*3+3):
+                                res += r0, c-1, -n
                         c0 = rc_bp(b0, list(pair[0])[0] - 1)[1]
                         for r in cn[c0][n-1]: # удаление из столбца c0
-                            if r-1!=r1 and r-1 not in range(b0//3*3,b0//3*3 +3):   
+                            if r-1!=r1 and r-1 not in range(b0//3*3,b0//3*3 +3):
                                 res+= r-1, c0, -n
                         pr = ' (замкнутая цепь)'
                     else: # концы не лежат в одном блоке
@@ -258,4 +261,4 @@ def dual_empty_rectangle(rc, rn, cn, bn):
                     for k in range(0, len(res), 3):
                         print(f'r{res[k]+1}c{res[k+1]+1} {res[k+2]} ', end = '')
                     print()
-                    return res                   
+                    return res

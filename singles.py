@@ -1,9 +1,12 @@
+"""Реализация методов, связанных с поиском одиночек (singles)."""
+
 def rc_bp(r, c):
-    """Преобразование координат (r, c) в (b, p) и наоборот"""
+    """Вспомогательная функция, 
+    преобразование координат (r, c) в (b, p) и наоборот."""
     return r//3 *3 + c//3, (r % 3)*3 + c % 3
 
 def full_house(block_points, row_points, column_points, rc, bp):
-    """Метод 'Заполнение дома'"""
+    """Метод 'Заполнение дома' (full house)."""
     for b in range(9):
         if block_points[b] == 1: # в блоке b проставлено 8 цифр
             for p in range(9):
@@ -27,7 +30,7 @@ def full_house(block_points, row_points, column_points, rc, bp):
                     return r, c, n
 
 def hidden_single(rn, cn, bn):
-    """Поиск скрытых одиночек"""
+    """Поиск скрытых одиночек (hidden single)."""
     for n in range(1, 10):
         for b in range(9): # поиск по блокам
             if type(bn[b][n - 1]) == set and len(bn[b][n - 1]) == 1:
@@ -46,7 +49,7 @@ def hidden_single(rn, cn, bn):
                 return r - 1, c, n
 
 def naked_single(rc):
-    """Поиск одиночек в ячейках"""
+    """Поиск одиночек в ячейках (naked single)."""
     for r in range(9):
         for c in range(9):
             if type(rc[r][c]) == set and len(rc[r][c]) == 1:
