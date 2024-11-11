@@ -7,7 +7,7 @@ from inspect import getfullargspec
 from singles import singles
 from intersections import intersections
 from locked_sets import call_locked_set, call_hidden_set, call_fish
-from one_digit_samples import skyscraper, finned_x_wing, two_string_kite,\
+from single_digit_patterns import skyscraper, finned_x_wing, two_string_kite,\
      grouped_2string_kite, turbot_fish, empty_rectangle, dual_empty_rectangle
 from wings import w_wing, xy_wing, xyz_wing
 from sue_de_coq import almost_locked_pair
