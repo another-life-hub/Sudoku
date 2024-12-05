@@ -4,6 +4,7 @@
 """
 
 from inspect import getfullargspec
+from re import fullmatch
 from singles import singles
 from intersections import intersections
 from locked_sets import call_locked_set, call_hidden_set, call_fish
@@ -29,6 +30,7 @@ def rc_bp(r, c):
     """Преобразование координат (r, c) в (b, p) и наоборот"""
     return r//3 *3 + c//3, (r % 3)*3 + c % 3
 
+# Перечисление всех реализованных методов решения
 subsets = call_locked_set(2), call_locked_set(3), call_hidden_set(2),\
           call_locked_set(4), call_hidden_set(3), call_locked_set(5)
 fish_ = call_fish(2), call_fish(3), call_fish(4)
@@ -42,26 +44,24 @@ NUM = len(methods)
 
 # Задание начальных значений количества точек и заданных цифр
 row_points = [0 for k in range(9)]
-column_points, block_points = row_points[:], row_points[:]
+column_points = row_points[:] 
+block_points = row_points[:]
 row_values = [set() for k in range(9)]
 column_values = [set() for k in range(9)]
 block_values = [set() for k in range(9)]
 
 # Запрос и проверка исходных данных
 initial = input('Задайте исходные данные (примеры есть в файле Примеры.txt): ')
-if initial[:8] == ':0000:x:' and initial[-2:] == '::': # проверка наличия тега
-    sud = initial[8:-2].split(':')
-    if len(sud) != 2:
-        print('\nНеправильный формат данных.')
-        exit()
-    tail, sud = sud[1], sud[0]
-    hodoku = True
-elif len(initial) == 81:
-    hodoku = False
+match = fullmatch(r'[:][0-9]{4}[:](.+?)[:](.+?)[:](.+?)[:](.+?)', initial)
+if match: # проверка на формат HoDoKu
+    sud, tail = match.group(2, 3)
+    hodoku = True 
+elif len(initial) == 81: # проверка на обычный формат судоку
+    hodoku = False 
     sud = initial[:]
     rc = [sud[r*9: r*9 +9] for r in range(9)]
     print('\nИсходные данные: ')
-    print_sudoku(rc)
+    print_sudoku(rc) # вывод исходных данных в наглядном представлении
 else:
     print('\nНеправильный формат данных.')
     exit()
