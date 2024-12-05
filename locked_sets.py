@@ -1,6 +1,8 @@
 """Поиск замкнутых множеств (naked subsets), 
    скрытых множеств (hidden subsets) и решёток без брака (fish)."""
 
+from itertools import product
+
 def rc_bp(r, c):
     """Вспомогательная функция,
     преобразование координат (r, c) в (b, p) и наоборот."""
@@ -10,34 +12,33 @@ def universal_locked_set(dim, m):
     """Вспомогательная функция,
     поиск замкнутых множеств размерности dim >=2 в строках матрицы m."""
     res = ()
-    for i0 in range(9):      # начало поиска замкнутого множества
-        for j0 in range(9):  # с ячейки (i0, j0)
-            if type(m[i0][j0]) == int or len(m[i0][j0]) > dim: 
-                continue
-            pos, cand = [], []
-            pos.append(j0)
-            cand.append(m[i0][j0])
-            start = j0 # стартовая позиция для поиска новой ячейки
-            while 0 < len(pos) < dim: # поиск следующей ячейки
-                for j in range(start + 1, 9):
-                    if type(m[i0][j]) == set and len(m[i0][j] | cand[-1])<=dim:
-                        cand.append(m[i0][j] | cand[-1])
-                        pos.append(j) # создание новой ячейки и 
-                        start = j     # переход к поиску следующей ячейки
-                        break
-                else:
-                    start = pos.pop() # удаление последней ячейки и 
-                    del cand[-1]      # возврат к поиску предыдущей ячейки
-            if not pos:  # множество не найдено
-                continue # переход к новой ячейке (i0, j0)
-            # поиск удаляемых кандидатов
-            for j in range(9):
-                for v in cand[-1]:
-                    if j not in pos and type(m[i0][j]) == set and v in m[i0][j]:
-                        res += j, v
-            if not res: # не найден ни один удаляемый кандидат
-                continue
-            return i0, res, pos, cand[-1]
+    for i0, j0 in product(range(9), repeat=2): # начало поиска замкнутого множества
+                                               # с ячейки (i0, j0)
+        if isinstance(m[i0][j0], int) or len(m[i0][j0]) > dim: 
+            continue
+        pos, cand = [], []
+        pos.append(j0)
+        cand.append(m[i0][j0])
+        start = j0 # стартовая позиция для поиска новой ячейки
+        while 0 < len(pos) < dim: # поиск следующей ячейки
+            for j in range(start + 1, 9):
+                if isinstance(m[i0][j], set) and len(m[i0][j] | cand[-1]) <= dim:
+                    cand.append(m[i0][j] | cand[-1])
+                    pos.append(j) # создание новой ячейки и 
+                    start = j     # переход к поиску следующей ячейки
+                    break
+            else:
+                start = pos.pop() # удаление последней ячейки и 
+                del cand[-1]      # возврат к поиску предыдущей ячейки
+        if not pos:  # множество не найдено
+            continue # переход к новой ячейке (i0, j0)
+        # поиск удаляемых кандидатов
+        for j, v in product(range(9), cand[-1]):
+            if j not in pos and isinstance(m[i0][j], set) and v in m[i0][j]:
+                res += j, v
+        if not res: # не найден ни один удаляемый кандидат
+            continue
+        return i0, res, pos, cand[-1]
 
 def call_locked_set(dim):
     def locked_set(rc, bp):
