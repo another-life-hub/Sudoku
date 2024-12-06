@@ -51,7 +51,6 @@ one_digit_samples = skyscraper, two_string_kite, turbot_fish,\
 wings = w_wing, xy_wing, xyz_wing
 methods = singles + (intersections,) + subsets + fish_ + one_digit_samples +\
           wings + (almost_locked_pair,)
-NUM = len(methods)
 
 # Задание начальных значений количества точек и заданных цифр
 row_points = [0 for k in range(9)]
@@ -63,7 +62,7 @@ block_values = [set() for k in range(9)]
 
 # Запрос и проверка исходных данных
 initial = input('Задайте исходные данные (примеры есть в файле Примеры.txt): ')
-match = fullmatch(r'[:][0-9]{4}[:](.+?)[:](.+?)[:](.+?)[:](.+?)', initial)
+match = fullmatch(r'[:][0-9]{4}[:](.+?)[:](.+?)[:](.*?)[:](.*)[:]', initial)
 if match: # проверка на формат HoDoKu
     sud, tail = match.group(2, 3)
     hodoku = True 
@@ -136,7 +135,7 @@ if hodoku and tail:
                 print('\nНеправильный формат данных.')
                 exit()
         r, c = int(triple[1]) - 1, int(triple[2]) - 1
-        if type(rc[r][c]) == int or not rc[r][c] - {int(triple[0])}:
+        if isinstance(rc[r][c], int) or not rc[r][c] - {int(triple[0])}:
             print('\nНеправильный формат данных.')
             exit()
         rc[r][c] -= {int(triple[0])}
@@ -150,7 +149,7 @@ for r in range(9):
     for c in range(9):
         b, p = rc_bp(r, c)
         bp[b][p] = rc[r][c]
-        if type(rc[r][c]) == int: # в позиции(r,c) стоит цифра
+        if isinstance(rc[r][c], int): # в позиции (r,c) стоит цифра
             n = rc[r][c]
             rn[r][n - 1] = c + 1
             cn[c][n - 1] = r + 1
@@ -170,16 +169,15 @@ while True:
     while r < 9 and row_points[r] == 0: r += 1
     if r == 9: break # задача решена
 
-    for method_num in range(NUM):
-        m = methods[method_num]
-        # Применение метода method_num со своими аргументами:
-        res = m(*[globals()[arg] for arg in getfullargspec(m)[0]])
-        if res: # метод method_num сработал
+    for method in methods:
+        # Применение метода со своими аргументами:
+        res = method(*[globals()[arg] for arg in getfullargspec(method)[0]])
+        if res: # метод сработал
             break
     else: # ни один метод не сработал
         fail = True
         break
-    if res[2] > 0: # метод method_num заполняет ячейку
+    if res[2] > 0: # метод заполняет ячейку
         r, c, n = res
         b, p = rc_bp(r, c)
         row_points[r] -= 1    # уменьшение количества
@@ -197,7 +195,7 @@ while True:
         cells |= {(r_, c) for r_ in range(9)} # столбец c
         cells |= {rc_bp(b, p_) for p_ in range(9)} # блок b
         for r_, c_ in cells - {(r, c)}:
-            if type(rc[r_][c_]) == int:
+            if isinstance(rc[r_][c_], int):
                 continue
             rc[r_][c_] -= {n} # удаление кандидата n из rc-матрицы
             if not rc[r_][c_]: # проверка на пустое множество
@@ -205,13 +203,13 @@ while True:
                 exit()
             b_, p_ = rc_bp(r_, c_)
             bp[b_][p_] = rc[r_][c_]
-            if type(rn[r_][n - 1]) == set: # Удаление кандидатов из ячеек,
-                rn[r_][n - 1] -= {c_ + 1} # соответствующих cells
-            if type(cn[c_][n - 1]) == set:# в bp-, rn-, cn-, bn-матрицах
+            if isinstance(rn[r_][n - 1], set): # Удаление кандидатов из ячеек,
+                rn[r_][n - 1] -= {c_ + 1}      # соответствующих cells
+            if isinstance(cn[c_][n - 1], set): # в bp-, rn-, cn-, bn-матрицах
                 cn[c_][n - 1] -= {r_ + 1}
-            if type(bn[b_][n - 1]) == set:
+            if isinstance(bn[b_][n - 1], set):
                 bn[b_][n - 1] -= {p_ + 1}
-    else: # метод method_num удаляет кандидаты
+    else: # метод удаляет кандидаты
         for k in range(0, len(res), 3):
             r, c, n = res[k], res[k + 1], -res[k + 2]
             rc[r][c] -= {n} # удаление из rc-матрицы
